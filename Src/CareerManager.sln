@@ -5,6 +5,11 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareerManager", "CareerManager.csproj", "{AD582C1F-AF38-4BFA-BB30-C47426505373}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{ECDDB84F-E987-4222-8B2E-1B881C8616C0}"
+	ProjectSection(SolutionItems) = preProject
+		..\Changelog.txt = ..\Changelog.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

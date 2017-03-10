@@ -1,0 +1,8 @@
+1.3.0
+		Initial release by LGG
+
+1.3.1
+		Added settings page
+			Enabled or not
+			use blizzy toolbar
+		Updated icons provided by @EmbersArc

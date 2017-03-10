@@ -51,15 +51,14 @@ namespace CareerManagerUI
             this.GuiActive = show;
         }
 
-        public CareerManagerGUIClass()
+        public void OnEnable()
         {
-            this.options = new Dictionary<CareerOptions, MenuToggle>();
-            bool toolbarAvailable = ToolbarManager.ToolbarAvailable;
-            if (toolbarAvailable)
+            Debug.Log("OnEnable");
+            if (ToolbarManager.ToolbarAvailable && HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy)
             {
                 this.useAppLauncher = false;
                 this.toolbarButton = ToolbarManager.Instance.add("CareerManager", "careermanagerbutton");
-                this.toolbarButton.TexturePath = "CareerManager/icons/careermanager_stock";
+                this.toolbarButton.TexturePath = "CareerManager/icons/careermanager24";
                 this.toolbarButton.ToolTip = "CareerManager options";
                 this.toolbarButton.OnClick += delegate (ClickEvent e)
                 {
@@ -68,22 +67,27 @@ namespace CareerManagerUI
             }
             else
             {
-                bool flag = this.appLauncherButton == null;
-                if (flag)
+                if (this.appLauncherButton == null)
                 {
                     this.appLauncherButton = ApplicationLauncher.Instance.AddModApplication(
                      () => {
-                        ToggleGui(true);
-                    },
+                         ToggleGui(true);
+                     },
                   () => {
-                        ToggleGui(false);
-                    },
+                      ToggleGui(false);
+                  },
                     null, null, null, null,
-                    ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION, GameDatabase.Instance.GetTexture("CareerManager/icons/careermanager_stock", false));
+                    ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION, GameDatabase.Instance.GetTexture("CareerManager/icons/careermanager38", false));
                 }
             }
             this.windowID = Guid.NewGuid().GetHashCode();
             this.optionsWindowRect = new Rect(200f, 175f, 200f, 25f);
+        }
+
+        public CareerManagerGUIClass()
+        {
+            this.options = new Dictionary<CareerOptions, MenuToggle>();
+           // OnEnable();
         }
 
         public void CreateToggle(CareerOptions opt, Rect rect, bool defaultstate, string description, Action<bool> cback)
@@ -150,14 +154,16 @@ namespace CareerManagerUI
 
         public void OnDisable()
         {
-            bool toolbarAvailable = ToolbarManager.ToolbarAvailable;
-            if (toolbarAvailable)
+            Debug.Log("OnDisable");
+            if (ToolbarManager.ToolbarAvailable && toolbarButton != null)
             {
                 this.toolbarButton.Destroy();
+                this.toolbarButton = null;
             }
-            else
+            if (this.appLauncherButton != null)
             {
                 ApplicationLauncher.Instance.RemoveModApplication(this.appLauncherButton);
+                this.appLauncherButton = null;
             }
         }
     }

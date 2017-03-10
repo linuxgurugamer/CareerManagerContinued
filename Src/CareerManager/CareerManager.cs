@@ -66,8 +66,9 @@ namespace CareerManager
 
 		public void FundsChanged(double amount, TransactionReasons reason)
 		{
-			bool flag = !this.CareerManagerGUI.GetOption(CareerOptions.LOCKFUNDS);
-			if (!flag)
+			//bool flag = !this.CareerManagerGUI.GetOption(CareerOptions.LOCKFUNDS);
+			//if (!flag)
+            if (this.CareerManagerGUI.GetOption(CareerOptions.LOCKFUNDS))
 			{
 				bool flag2 = reason != TransactionReasons.Cheating;
 				if (flag2)
@@ -79,8 +80,9 @@ namespace CareerManager
 
 		public void ScienceChanged(float amount, TransactionReasons reason)
 		{
-			bool flag = !this.CareerManagerGUI.GetOption(CareerOptions.LOCKSCIENCE);
-			if (!flag)
+			//bool flag = !this.CareerManagerGUI.GetOption(CareerOptions.LOCKSCIENCE);
+			//if (!flag)
+            if (this.CareerManagerGUI.GetOption(CareerOptions.LOCKSCIENCE))
 			{
 				bool flag2 = reason != TransactionReasons.Cheating;
 				if (flag2)
@@ -192,15 +194,17 @@ namespace CareerManager
 
 		public void LockScience()
 		{
-			bool flag = ResearchAndDevelopment.Instance.Science < CareerManager.SCIENCE_LOCK;
-			if (flag)
+			//bool flag = ResearchAndDevelopment.Instance.Science < CareerManager.SCIENCE_LOCK;
+			//if (flag)
+            if (ResearchAndDevelopment.Instance.Science < CareerManager.SCIENCE_LOCK)
 			{
 				ResearchAndDevelopment.Instance.AddScience(CareerManager.SCIENCE_LOCK - ResearchAndDevelopment.Instance.Science, TransactionReasons.Cheating);
 			}
 			else
 			{
-				bool flag2 = Funding.Instance.Funds > CareerManager.MONEY_LOCK;
-				if (flag2)
+				//bool flag2 = Funding.Instance.Funds > CareerManager.MONEY_LOCK;
+				//if (flag2)
+                if (Funding.Instance.Funds > CareerManager.MONEY_LOCK)
 				{
 					ResearchAndDevelopment.Instance.AddScience(-ResearchAndDevelopment.Instance.Science, TransactionReasons.Cheating);
 					ResearchAndDevelopment.Instance.AddScience(CareerManager.SCIENCE_LOCK, TransactionReasons.Cheating);
@@ -210,15 +214,17 @@ namespace CareerManager
 
 		public void RnDOpened(RDController controller)
 		{
-			bool flag = this.unlockTechnology == TechnologyUnlock.UNLOCK;
-			if (flag)
+			//bool flag = this.unlockTechnology == TechnologyUnlock.UNLOCK;
+			//if (flag)
+            if (this.unlockTechnology == TechnologyUnlock.UNLOCK)
 			{
 				this.UnlockTechnologies();
 			}
 			else
 			{
-				bool flag2 = this.unlockTechnology == TechnologyUnlock.REVERT;
-				if (flag2)
+				//bool flag2 = this.unlockTechnology == TechnologyUnlock.REVERT;
+				//if (flag2)
+                if (this.unlockTechnology == TechnologyUnlock.REVERT)
 				{
 					this.LockTechnologies();
 				}
@@ -237,8 +243,9 @@ namespace CareerManager
 
 		public void UnlockTechnologies()
 		{
-			bool flag = !this.RnDOpen;
-			if (!flag)
+			//bool flag = !this.RnDOpen;
+			//if (!flag)
+            if (this.RnDOpen)
 			{
 				this.unlockTechnology = TechnologyUnlock.OFF;
 				float scienceCostLimit = GameVariables.Instance.GetScienceCostLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.ResearchAndDevelopment));
@@ -255,14 +262,16 @@ namespace CareerManager
 
 		private void LockTechnologies()
 		{
-			bool flag = !this.RnDOpen;
-			if (!flag)
+			//bool flag = !this.RnDOpen;
+			//if (!flag)
+            if (this.RnDOpen)
 			{
 				this.unlockTechnology = TechnologyUnlock.OFF;
 				foreach (RDNode current in RDController.Instance.nodes)
 				{
-					bool flag2 = current.tech.scienceCost > 0;
-					if (flag2)
+					//bool flag2 = current.tech.scienceCost > 0;
+					//if (flag2)
+                    if (current.tech.scienceCost > 0)
 					{
 						ProtoTechNode techState = ResearchAndDevelopment.Instance.GetTechState(current.tech.techID);
 						techState.state = RDTech.State.Unavailable;
@@ -279,8 +288,9 @@ namespace CareerManager
 			{
 				foreach (UpgradeableFacility current in pu.Value.facilityRefs)
 				{
-					bool flag = !this.facilities.ContainsKey(current.name);
-					if (flag)
+					//bool flag = !this.facilities.ContainsKey(current.name);
+					//if (flag)
+                    if (!this.facilities.ContainsKey(current.name))
 					{
 						this.facilities.Add(current.name, ScenarioUpgradeableFacilities.GetFacilityLevel(current.name));
 					}
@@ -299,8 +309,9 @@ namespace CareerManager
 			{
 				foreach (UpgradeableFacility current in pu.Value.facilityRefs)
 				{
-					bool flag = facilities.ContainsKey(current.name);
-					if (flag)
+					//bool flag = facilities.ContainsKey(current.name);
+					//if (flag)
+                    if (facilities.ContainsKey(current.name))
 					{
 						float num = facilities[current.name];
 						current.SetLevel((int)(num * (float)pu.Value.GetLevelCount()));
@@ -313,18 +324,69 @@ namespace CareerManager
 			});
 		}
 
-		private void Start()
+        bool settingsEnabled = false;
+        bool blizzyEnabled = false;
+        void restart()
+        {
+            Debug.Log("restart, enabled: " + HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled.ToString());
+            Debug.Log("restart, useBlizzy: " + HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy.ToString());
+            Debug.Log("settingsEnabled: " + settingsEnabled.ToString() + "    blizzyEnabled: " + blizzyEnabled.ToString());
+            if (HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
+            {
+                if (!settingsEnabled)
+                {
+                    GameEvents.OnFundsChanged.Add(new EventData<double, TransactionReasons>.OnEvent(FundsChanged));
+                    GameEvents.OnScienceChanged.Add(new EventData<float, TransactionReasons>.OnEvent(ScienceChanged));
+                    RDController.OnRDTreeSpawn.Add(new EventData<RDController>.OnEvent(RnDOpened));
+                    GameEvents.onGUIRnDComplexSpawn.Add(new EventVoid.OnEvent(RnDGUIOpened));
+                    GameEvents.onGUIRnDComplexDespawn.Add(new EventVoid.OnEvent(RnDGUIClosed));
+                    CareerManagerGUI.OnEnable();
+                    settingsEnabled = true;
+                    
+                }
+                else
+                {
+                    if (ToolbarManager.ToolbarAvailable && blizzyEnabled != HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy)
+                    {
+                        CareerManagerGUI.OnDisable();
+                        CareerManagerGUI.OnEnable();
+                        
+                    }
+                }
+                blizzyEnabled = (ToolbarManager.ToolbarAvailable && HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy);
+
+            }
+            else
+            {
+                if (settingsEnabled)
+                {
+                    GameEvents.OnFundsChanged.Remove(new EventData<double, TransactionReasons>.OnEvent(this.FundsChanged));
+                    GameEvents.OnScienceChanged.Remove(new EventData<float, TransactionReasons>.OnEvent(this.ScienceChanged));
+                    RDController.OnRDTreeSpawn.Remove(new EventData<RDController>.OnEvent(this.RnDOpened));
+                    GameEvents.onGUIRnDComplexSpawn.Remove(new EventVoid.OnEvent(this.RnDGUIOpened));
+                    GameEvents.onGUIRnDComplexDespawn.Remove(new EventVoid.OnEvent(this.RnDGUIClosed));
+                    CareerManagerGUI.OnDisable();
+                    settingsEnabled = false;
+                    blizzyEnabled = false;
+                }
+            }
+        }
+
+        private void Start()
 		{
-			GameEvents.OnFundsChanged.Add(new EventData<double, TransactionReasons>.OnEvent(FundsChanged));
-			GameEvents.OnScienceChanged.Add(new EventData<float, TransactionReasons>.OnEvent(ScienceChanged));
-			RDController.OnRDTreeSpawn.Add(new EventData<RDController>.OnEvent(RnDOpened));
-			GameEvents.onGUIRnDComplexSpawn.Add(new EventVoid.OnEvent(RnDGUIOpened));
-			GameEvents.onGUIRnDComplexDespawn.Add(new EventVoid.OnEvent(RnDGUIClosed));
+            GameEvents.OnGameSettingsApplied.Add(restart);
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
+                return;
+
+            restart();
 		}
 
 		public void Update()
 		{
-			bool flag = this.RnDOpen && this.unlockTechnology == TechnologyUnlock.REVERT;
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
+                return;
+
+            bool flag = this.RnDOpen && this.unlockTechnology == TechnologyUnlock.REVERT;
 			if (flag)
 			{
 				this.LockTechnologies();
@@ -341,7 +403,10 @@ namespace CareerManager
 
 		public override void OnSave(ConfigNode node)
 		{
-			bool flag = this.unlockTechnology == TechnologyUnlock.UNLOCK;
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
+                return;
+
+            bool flag = this.unlockTechnology == TechnologyUnlock.UNLOCK;
 			if (flag)
 			{
 				CareerManagerGUI.SetOption(CareerOptions.UNLOCKTECH, false);
@@ -369,7 +434,10 @@ namespace CareerManager
 
 		public override void OnLoad(ConfigNode node)
 		{
-			CareerManagerGUI.LoadSettings(node);
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
+                return;
+
+            CareerManagerGUI.LoadSettings(node);
 			bool flag = node.HasValue("RevertFunds");
 			if (flag)
 			{
@@ -396,7 +464,10 @@ namespace CareerManager
 
 		private void OnDestroy()
 		{
-			GameEvents.OnFundsChanged.Remove(new EventData<double, TransactionReasons>.OnEvent(this.FundsChanged));
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
+                return;
+
+            GameEvents.OnFundsChanged.Remove(new EventData<double, TransactionReasons>.OnEvent(this.FundsChanged));
 			GameEvents.OnScienceChanged.Remove(new EventData<float, TransactionReasons>.OnEvent(this.ScienceChanged));
 			RDController.OnRDTreeSpawn.Remove(new EventData<RDController>.OnEvent(this.RnDOpened));
 			GameEvents.onGUIRnDComplexSpawn.Remove(new EventVoid.OnEvent(this.RnDGUIOpened));
@@ -406,7 +477,8 @@ namespace CareerManager
 
 		private void OnGUI()
 		{
-			CareerManagerGUI.DrawGUI();
+            if (HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
+                CareerManagerGUI.DrawGUI();
 		}
 	}
 }

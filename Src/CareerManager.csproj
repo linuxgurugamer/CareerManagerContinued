@@ -35,6 +35,7 @@
     <Compile Include="CareerManagerUI\CareerOptions.cs" />
     <Compile Include="CareerManagerUI\MenuToggle.cs" />
     <Compile Include="CareerManager\CareerManager.cs" />
+    <Compile Include="CareerManager\Settings.cs" />
     <Compile Include="CareerManager\TechnologyUnlock.cs" />
     <Compile Include="CareerManager\ToolbarManager.cs" />
     <Compile Include="CareerManager\ToolbarTypes.cs" />
