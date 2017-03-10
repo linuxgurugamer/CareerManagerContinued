@@ -119,6 +119,7 @@ namespace CareerManagerUI
         {
             node.GetConfigValue(out this.options[CareerOptions.LOCKFUNDS]._state, "LockFunds");
             node.GetConfigValue(out this.options[CareerOptions.LOCKSCIENCE]._state, "LockScience");
+            node.GetConfigValue(out this.options[CareerOptions.LOCKREPUTATION]._state, "LockReputation");
             node.GetConfigValue(out this.options[CareerOptions.UNLOCKBUILDINGS]._state, "UnlockBuildings");
             node.GetConfigValue(out this.options[CareerOptions.UNLOCKTECH]._state, "UnlockTech");
         }
@@ -127,6 +128,7 @@ namespace CareerManagerUI
         {
             node.AddValue("LockFunds", this.GetOption(CareerOptions.LOCKFUNDS).ToString());
             node.AddValue("LockScience", this.GetOption(CareerOptions.LOCKSCIENCE).ToString());
+            node.AddValue("LockReputation", this.GetOption(CareerOptions.LOCKREPUTATION).ToString());
             node.AddValue("UnlockBuildings", this.GetOption(CareerOptions.UNLOCKBUILDINGS).ToString());
             node.AddValue("UnlockTech", this.GetOption(CareerOptions.UNLOCKTECH).ToString());
         }

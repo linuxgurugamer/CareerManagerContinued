@@ -6,6 +6,7 @@ namespace CareerManagerUI
 	{
 		LOCKFUNDS,
 		LOCKSCIENCE,
+        LOCKREPUTATION,
 		UNLOCKTECH,
 		UNLOCKBUILDINGS
 	}

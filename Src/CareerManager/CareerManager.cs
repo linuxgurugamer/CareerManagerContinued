@@ -19,6 +19,8 @@ namespace CareerManager
 
 		public static float SCIENCE_LOCK = 9999999f;
 
+        public static float REPUTATION_LOCK = 1000;
+
 		CareerManagerGUIClass CareerManagerGUI = new CareerManagerGUIClass();
 
 		private TechnologyUnlock unlockTechnology = TechnologyUnlock.OFF;
@@ -26,6 +28,8 @@ namespace CareerManager
 		private double revertFunds = CareerManager.MONEY_LOCK;
 
 		private float revertScience = CareerManager.SCIENCE_LOCK;
+
+        private float revertReputation = CareerManager.REPUTATION_LOCK;
 
 		private Dictionary<string, float> facilities = new Dictionary<string, float>();
 
@@ -54,13 +58,19 @@ namespace CareerManager
 				GameScenes.FLIGHT,
 				GameScenes.TRACKSTATION
 			});
-			this.CareerManagerGUI.CreateToggle(CareerOptions.LOCKSCIENCE, rect, false, "Lock science points", new Action<bool>(this.ScienceLocked), new GameScenes[]
-			{
-				GameScenes.SPACECENTER,
-				GameScenes.FLIGHT,
-				GameScenes.TRACKSTATION
-			});
-			this.CareerManagerGUI.CreateToggle(CareerOptions.UNLOCKBUILDINGS, rect, false, "Unlock buildings", new Action<bool>(this.BuildingsUnlocked));
+            this.CareerManagerGUI.CreateToggle(CareerOptions.LOCKSCIENCE, rect, false, "Lock science points", new Action<bool>(this.ScienceLocked), new GameScenes[]
+            {
+                GameScenes.SPACECENTER,
+                GameScenes.FLIGHT,
+                GameScenes.TRACKSTATION
+            });
+            this.CareerManagerGUI.CreateToggle(CareerOptions.LOCKREPUTATION, rect, false, "Lock reputation", new Action<bool>(this.ReputationLocked), new GameScenes[]
+            {
+                GameScenes.SPACECENTER,
+                GameScenes.FLIGHT,
+                GameScenes.TRACKSTATION
+            });
+            this.CareerManagerGUI.CreateToggle(CareerOptions.UNLOCKBUILDINGS, rect, false, "Unlock buildings", new Action<bool>(this.BuildingsUnlocked));
 			this.CareerManagerGUI.CreateToggle(CareerOptions.UNLOCKTECH, rect, false, "Unlock technologies", new Action<bool>(this.TechnologiesUnlocked));
 		}
 
@@ -78,21 +88,34 @@ namespace CareerManager
 			}
 		}
 
-		public void ScienceChanged(float amount, TransactionReasons reason)
-		{
-			//bool flag = !this.CareerManagerGUI.GetOption(CareerOptions.LOCKSCIENCE);
-			//if (!flag)
+        public void ScienceChanged(float amount, TransactionReasons reason)
+        {
+            //bool flag = !this.CareerManagerGUI.GetOption(CareerOptions.LOCKSCIENCE);
+            //if (!flag)
             if (this.CareerManagerGUI.GetOption(CareerOptions.LOCKSCIENCE))
-			{
-				bool flag2 = reason != TransactionReasons.Cheating;
-				if (flag2)
-				{
-					this.LockScience();
-				}
-			}
-		}
+            {
+                bool flag2 = reason != TransactionReasons.Cheating;
+                if (flag2)
+                {
+                    this.LockScience();
+                }
+            }
+        }
+        public void ReputationChanged(float amount, TransactionReasons reason)
+        {
+            //bool flag = !this.CareerManagerGUI.GetOption(CareerOptions.LOCKSCIENCE);
+            //if (!flag)
+            if (this.CareerManagerGUI.GetOption(CareerOptions.LOCKREPUTATION))
+            {
+                bool flag2 = reason != TransactionReasons.Cheating;
+                if (flag2)
+                {
+                    this.LockReputation();
+                }
+            }
+        }
 
-		public void FundsLocked(bool state)
+        public void FundsLocked(bool state)
 		{
 			if (state)
 			{
@@ -124,7 +147,24 @@ namespace CareerManager
 			}
 		}
 
-		public void BuildingsUnlocked(bool state)
+        public void ReputationLocked(bool state)
+        {
+            if (state)
+            {
+                this.revertReputation =  Reputation.Instance.reputation;
+                this.LockReputation();
+                ScreenMessages.PostScreenMessage("CareerManager: Reputation locked.");
+            }
+            else
+            {
+                Reputation.Instance.AddReputation(-Reputation.Instance.reputation, TransactionReasons.Cheating);
+                Reputation.Instance.AddReputation(this.revertReputation, TransactionReasons.Cheating);
+                ScreenMessages.PostScreenMessage("CareerManager: Reputation reverted.");
+            }
+        }
+
+
+        public void BuildingsUnlocked(bool state)
 		{
 			if (state)
 			{
@@ -192,27 +232,47 @@ namespace CareerManager
 			}
 		}
 
-		public void LockScience()
-		{
-			//bool flag = ResearchAndDevelopment.Instance.Science < CareerManager.SCIENCE_LOCK;
-			//if (flag)
+        public void LockScience()
+        {
+            //bool flag = ResearchAndDevelopment.Instance.Science < CareerManager.SCIENCE_LOCK;
+            //if (flag)
             if (ResearchAndDevelopment.Instance.Science < CareerManager.SCIENCE_LOCK)
-			{
-				ResearchAndDevelopment.Instance.AddScience(CareerManager.SCIENCE_LOCK - ResearchAndDevelopment.Instance.Science, TransactionReasons.Cheating);
-			}
-			else
-			{
-				//bool flag2 = Funding.Instance.Funds > CareerManager.MONEY_LOCK;
-				//if (flag2)
+            {
+                ResearchAndDevelopment.Instance.AddScience(CareerManager.SCIENCE_LOCK - ResearchAndDevelopment.Instance.Science, TransactionReasons.Cheating);
+            }
+            else
+            {
+                //bool flag2 = Funding.Instance.Funds > CareerManager.MONEY_LOCK;
+                //if (flag2)
                 if (Funding.Instance.Funds > CareerManager.MONEY_LOCK)
-				{
-					ResearchAndDevelopment.Instance.AddScience(-ResearchAndDevelopment.Instance.Science, TransactionReasons.Cheating);
-					ResearchAndDevelopment.Instance.AddScience(CareerManager.SCIENCE_LOCK, TransactionReasons.Cheating);
-				}
-			}
-		}
+                {
+                    ResearchAndDevelopment.Instance.AddScience(-ResearchAndDevelopment.Instance.Science, TransactionReasons.Cheating);
+                    ResearchAndDevelopment.Instance.AddScience(CareerManager.SCIENCE_LOCK, TransactionReasons.Cheating);
+                }
+            }
+        }
 
-		public void RnDOpened(RDController controller)
+        public void LockReputation()
+        {
+            //bool flag = ResearchAndDevelopment.Instance.Science < CareerManager.SCIENCE_LOCK;
+            //if (flag)
+            if (Reputation.Instance.reputation < CareerManager.REPUTATION_LOCK)
+            {
+                Reputation.Instance.AddReputation(CareerManager.REPUTATION_LOCK - Reputation.Instance.reputation, TransactionReasons.Cheating);
+            }
+            else
+            {
+                //bool flag2 = Funding.Instance.Funds > CareerManager.MONEY_LOCK;
+                //if (flag2)
+                if (Funding.Instance.Funds > CareerManager.MONEY_LOCK)
+                {
+                    Reputation.Instance.AddReputation(-Reputation.Instance.reputation, TransactionReasons.Cheating);
+                    Reputation.Instance.AddReputation(CareerManager.REPUTATION_LOCK, TransactionReasons.Cheating);
+                }
+            }
+        }
+
+        public void RnDOpened(RDController controller)
 		{
 			//bool flag = this.unlockTechnology == TechnologyUnlock.UNLOCK;
 			//if (flag)
