@@ -1,6 +1,6 @@
 ﻿
 
-set H=r:\KSP_1.2.2_dev\GameData
+set H=r:\KSP_1.3.0_dev\GameData
 
 copy bin\Debug\CareerManager.dll ..\GameData\CareerManager\Plugins
 

@@ -19,6 +19,7 @@ namespace CareerManager
         public override string Title { get { return ""; } } // column heading
         public override GameParameters.GameMode GameMode { get { return GameParameters.GameMode.ANY; } }
         public override string Section { get { return "Career Manager"; } }
+        public override string DisplaySection { get { return "Career Manager"; } }
         public override int SectionOrder { get { return 1; } }
         public override bool HasPresets { get { return false; } }
 

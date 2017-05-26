@@ -7,7 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareerManager", "CareerMana
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{ECDDB84F-E987-4222-8B2E-1B881C8616C0}"
 	ProjectSection(SolutionItems) = preProject
+		buildRelease.bat = buildRelease.bat
+		CareerManagerContinued.version = CareerManagerContinued.version
 		..\Changelog.txt = ..\Changelog.txt
+		deploy.bat = deploy.bat
 	EndProjectSection
 EndProject
 Global

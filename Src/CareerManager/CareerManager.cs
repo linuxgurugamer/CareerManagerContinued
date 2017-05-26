@@ -331,7 +331,7 @@ namespace CareerManager
 				{
 					//bool flag2 = current.tech.scienceCost > 0;
 					//if (flag2)
-                    if (current.tech.scienceCost > 0)
+                    if (current != null && current.tech.scienceCost > 0)
 					{
 						ProtoTechNode techState = ResearchAndDevelopment.Instance.GetTechState(current.tech.techID);
 						techState.state = RDTech.State.Unavailable;
