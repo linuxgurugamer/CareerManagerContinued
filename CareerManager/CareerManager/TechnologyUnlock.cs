@@ -1,6 +1,6 @@
 using System;
 
-namespace CareerManager
+namespace CareerManagerNS
 {
 	public enum TechnologyUnlock
 	{

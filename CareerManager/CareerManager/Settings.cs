@@ -9,7 +9,7 @@ using UnityEngine;
 
 
 
-namespace CareerManager
+namespace CareerManagerNS
 {
     // http://forum.kerbalspaceprogram.com/index.php?/topic/147576-modders-notes-for-ksp-12/#comment-2754813
     // search for "Mod integration into Stock Settings

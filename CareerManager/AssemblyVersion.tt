@@ -28,7 +28,7 @@
 	string s;
 
 	var projectPath = Host.ResolveAssemblyReference("$(ProjectDir)");
-	string versionfile =   @"D:\Users\jbb\github\CareerManagerContinued\Src\CareerManagerContinued.version";
+	string versionfile =   @"D:\Users\jbb\github\CareerManagerContinued\CareerManagerContinued.version";
 
 	if (!File.Exists(versionfile))
 	{

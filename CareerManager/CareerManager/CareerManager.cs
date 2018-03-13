@@ -7,14 +7,14 @@ using System.Linq;
 using UnityEngine;
 using Upgradeables;
 
-namespace CareerManager
+namespace CareerManagerNS
 {
 
     [KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.SPACECENTER, GameScenes.TRACKSTATION)]
 
     public class CareerManager : ScenarioModule
 	{
-
+        public static CareerManager Instance;
 		public static double MONEY_LOCK = 99999999999.0;
 
 		public static float SCIENCE_LOCK = 9999999f;
@@ -47,6 +47,7 @@ namespace CareerManager
 			this.facilities.Add("Administration", 0f);
 			this.facilities.Add("SpaceplaneHangar", 0f);
 			this.SetupToggles();
+            Instance = this;
 		}
 
 		private void SetupToggles()
@@ -71,10 +72,12 @@ namespace CareerManager
                 GameScenes.TRACKSTATION
             });
             this.CareerManagerGUI.CreateToggle(CareerOptions.UNLOCKBUILDINGS, rect, false, "Unlock buildings", new Action<bool>(this.BuildingsUnlocked));
-			this.CareerManagerGUI.CreateToggle(CareerOptions.UNLOCKTECH, rect, false, "Unlock technologies", new Action<bool>(this.TechnologiesUnlocked));
-		}
+            this.CareerManagerGUI.CreateToggle(CareerOptions.UNLOCKTECH, rect, false, "Unlock technologies", new Action<bool>(this.TechnologiesUnlocked));
+            this.CareerManagerGUI.CreateToggle(CareerOptions.KICKSTART, rect, false, "Kickstart career", new Action<bool>(this.Kickstart));
 
-		public void FundsChanged(double amount, TransactionReasons reason)
+        }
+
+        public void FundsChanged(double amount, TransactionReasons reason)
 		{
 			//bool flag = !this.CareerManagerGUI.GetOption(CareerOptions.LOCKFUNDS);
 			//if (!flag)
@@ -178,15 +181,26 @@ namespace CareerManager
 			}
 		}
 
-		public void TechnologiesUnlocked(bool state)
-		{
-			if (state)
+        public void TechnologiesUnlocked(bool state)
+        {
+            TechnologiesUnlocked(state, true, 999);
+        }
+
+        public void Kickstart(bool state)
+        {
+            CareerManagerGUIClass.kickstartEntry = true;
+        }
+
+
+        public void TechnologiesUnlocked(bool state, bool all, int maxDepth)
+        {
+            if (state)
 			{
 				this.unlockTechnology = TechnologyUnlock.UNLOCK;
 				bool rnDOpen = this.RnDOpen;
 				if (rnDOpen)
 				{
-					this.UnlockTechnologies();
+					this.UnlockTechnologies(all, maxDepth);
 					ScreenMessages.PostScreenMessage("CareerManager: Technologies unlocked. Close and reopen the R&D screen to see changes.");
 				}
 				else
@@ -301,7 +315,18 @@ namespace CareerManager
 			this.RnDOpen = true;
 		}
 
-		public void UnlockTechnologies()
+        int NodeDepth(RDNode current)
+        {
+            int depth = 1;
+            while (current.parents.Count() >0)
+            {
+                current = current.parents[0].parent.node;
+                depth++;
+            }
+
+            return depth;
+        }
+		public void UnlockTechnologies(bool all = true, int maxDepth = 999)
 		{
 			//bool flag = !this.RnDOpen;
 			//if (!flag)
@@ -311,11 +336,26 @@ namespace CareerManager
 				float scienceCostLimit = GameVariables.Instance.GetScienceCostLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.ResearchAndDevelopment));
 				foreach (RDNode current in RDController.Instance.nodes)
 				{
-					bool flag2 = current.tech != null && (float)current.tech.scienceCost < scienceCostLimit;
-					if (flag2)
-					{
-						current.tech.UnlockTech(true);
-					}
+                    if (NodeDepth(current) <= maxDepth)
+                    {
+                        double currentFunds = 0;
+                        if (!all)
+                        {
+                            currentFunds = Funding.Instance.Funds;
+                            Funding.Instance.AddFunds(CareerManager.MONEY_LOCK - Funding.Instance.Funds, TransactionReasons.Cheating);
+                            
+                        }
+                        bool flag2 = current.tech != null && (float)current.tech.scienceCost < scienceCostLimit;
+                        if (flag2)
+                        {
+                            current.tech.UnlockTech(true);
+                        }
+                        if (!all)
+                        {
+                            Funding.Instance.AddFunds(-Funding.Instance.Funds, TransactionReasons.Cheating);
+                            Funding.Instance.AddFunds(currentFunds, TransactionReasons.Cheating);
+                        }
+                    }
 				}
 			}
 		}

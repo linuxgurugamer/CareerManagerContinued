@@ -1,9 +1,8 @@
-using CareerManager;
+using CareerManagerNS;
 using ImportantUtilities;
 using KSP.UI.Screens;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace CareerManagerUI
@@ -14,6 +13,8 @@ namespace CareerManagerUI
 
         private bool guiActive = false;
 
+        internal static bool kickstartEntry = false;
+
         public bool useAppLauncher = true;
 
         private IButton toolbarButton = null;
@@ -23,6 +24,7 @@ namespace CareerManagerUI
         private int windowID;
 
         private Rect optionsWindowRect;
+        private Rect kickstartWindowRect;
 
         private Dictionary<CareerOptions, MenuToggle> options;
 
@@ -82,6 +84,7 @@ namespace CareerManagerUI
             }
             this.windowID = Guid.NewGuid().GetHashCode();
             this.optionsWindowRect = new Rect(200f, 175f, 200f, 25f);
+            kickstartWindowRect = new Rect(200f, 175f, 200f, 25f);
         }
 
         public CareerManagerGUIClass()
@@ -135,12 +138,50 @@ namespace CareerManagerUI
 
         public void DrawGUI()
         {
-            bool flag = this.GuiActive;
-            if (flag)
+            if (this.GuiActive)
             {
                 GUI.skin = HighLogic.Skin;
-                this.optionsWindowRect = GUILayout.Window(this.windowID, this.optionsWindowRect, new GUI.WindowFunction(this.Draw), "CareerManager Options");
+                this.optionsWindowRect = GUILayout.Window(this.windowID, this.optionsWindowRect, this.Draw, "CareerManager Options");
             }
+            if (kickstartEntry)
+            {
+                guiActive = false;
+                kickstartWindowRect = GUILayout.Window(this.windowID + 1, kickstartWindowRect, DrawKickstartWindow, "Kickstart Career");
+            }
+        }
+
+        string kickstartLevel = "";
+        void DrawKickstartWindow(int windowID)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Enter kickstart level: ");
+            kickstartLevel = GUILayout.TextField(kickstartLevel, 2);
+            if (kickstartLevel.Length > 2)
+                kickstartLevel = kickstartLevel.Substring(0, 2);
+            if (kickstartLevel.Length > 0)
+            {
+                if (!char.IsDigit(kickstartLevel[kickstartLevel.Length - 1]))
+                {
+                    kickstartLevel = kickstartLevel.Substring(0, kickstartLevel.Length - 1);
+                }
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Apply"))
+            {
+                if (kickstartLevel != "")
+                CareerManager.Instance.TechnologiesUnlocked(true, true, int.Parse(kickstartLevel));
+                kickstartEntry = false;
+            }
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Cancel"))
+            {
+                kickstartEntry = false;
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUI.DragWindow();
         }
 
         public void Draw(int windowID)
