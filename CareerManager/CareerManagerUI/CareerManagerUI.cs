@@ -5,8 +5,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+using ClickThroughFix;
+using ToolbarControl_NS;
+
 namespace CareerManagerUI
 {
+
+    //[KSPAddon(KSPAddon.Startup.EditorAny | KSPAddon.Startup.SpaceCentre | KSPAddon.Startup.Flight | KSPAddon.Startup.TrackingStation, false)]
+    [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     public class CareerManagerGUIClass : MonoBehaviour
     {
 
@@ -15,18 +21,14 @@ namespace CareerManagerUI
 
         internal static bool kickstartEntry = false;
 
-        public bool useAppLauncher = true;
-
-        private IButton toolbarButton = null;
-
-        private ApplicationLauncherButton appLauncherButton = null;
+        internal ToolbarControl toolbarControl = null;
 
         private int windowID;
 
         private Rect optionsWindowRect;
         private Rect kickstartWindowRect;
 
-        private Dictionary<CareerOptions, MenuToggle> options;
+        private static Dictionary<CareerOptions, MenuToggle> options = new Dictionary<CareerOptions, MenuToggle>();
 
         public bool GuiActive
         {
@@ -44,42 +46,39 @@ namespace CareerManagerUI
         {
             get
             {
-                return this.options;
+                return options;
             }
         }
 
-        public void ToggleGui(bool show)
+        public void ToggleGui()
         {
-            this.GuiActive = show;
+            this.GuiActive = !this.GuiActive;
         }
 
-        public void OnEnable()
+        public void Start()
         {
-            Debug.Log("OnEnable");
-            if (ToolbarManager.ToolbarAvailable && HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy)
+            Debug.Log("CareerManagerUI.Start");
+            InitToolbar();
+            //DontDestroyOnLoad(this);
+        }
+        public void InitToolbar()
+        {
+            Debug.Log("CareerManagerUI.InitToolbar");
+
             {
-                this.useAppLauncher = false;
-                this.toolbarButton = ToolbarManager.Instance.add("CareerManager", "careermanagerbutton");
-                this.toolbarButton.TexturePath = "CareerManager/icons/careermanager24";
-                this.toolbarButton.ToolTip = "CareerManager options";
-                this.toolbarButton.OnClick += delegate (ClickEvent e)
+
+                if (toolbarControl == null)
                 {
-                    this.ToggleGui(!this.guiActive);
-                };
-            }
-            else
-            {
-                if (this.appLauncherButton == null)
-                {
-                    this.appLauncherButton = ApplicationLauncher.Instance.AddModApplication(
-                     () => {
-                         ToggleGui(true);
-                     },
-                  () => {
-                      ToggleGui(false);
-                  },
-                    null, null, null, null,
-                    ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION, GameDatabase.Instance.GetTexture("CareerManager/icons/careermanager38", false));
+                    toolbarControl = gameObject.AddComponent<ToolbarControl>();
+                    toolbarControl.AddToAllToolbars(ToggleGui, ToggleGui,
+                        ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION,
+                        "CareerManager_NS",
+                        "careerManagerButton",
+                        "CareerManager/icons/careermanager38",
+                        "CareerManager/icons/careermanager24",
+                        "Career Manager"
+                    );
+                    toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy);
                 }
             }
             this.windowID = Guid.NewGuid().GetHashCode();
@@ -89,42 +88,42 @@ namespace CareerManagerUI
 
         public CareerManagerGUIClass()
         {
-            this.options = new Dictionary<CareerOptions, MenuToggle>();
-           // OnEnable();
+            //options = new Dictionary<CareerOptions, MenuToggle>();
+            // OnEnable();
         }
 
         public void CreateToggle(CareerOptions opt, Rect rect, bool defaultstate, string description, Action<bool> cback)
         {
-            this.options.Add(opt, new MenuToggle(rect, defaultstate, description, cback));
+            options.Add(opt, new MenuToggle(rect, defaultstate, description, cback));
         }
 
         public void CreateToggle(CareerOptions opt, Rect rect, bool defaultstate, string description, Action<bool> cback, GameScenes[] scenes)
         {
-            this.options.Add(opt, new MenuToggle(rect, defaultstate, description, cback, scenes));
+            options.Add(opt, new MenuToggle(rect, defaultstate, description, cback, scenes));
         }
 
         public bool GetOption(CareerOptions opt)
         {
-            bool flag = this.options.ContainsKey(opt);
-            return flag && this.options[opt].GetState();
+            bool flag = options.ContainsKey(opt);
+            return flag && options[opt].GetState();
         }
 
         public void SetOption(CareerOptions opt, bool value)
         {
-            bool flag = this.options.ContainsKey(opt);
+            bool flag = options.ContainsKey(opt);
             if (flag)
             {
-                this.options[opt].state = value;
+                options[opt].state = value;
             }
         }
 
         public void LoadSettings(ConfigNode node)
         {
-            node.GetConfigValue(out this.options[CareerOptions.LOCKFUNDS]._state, "LockFunds");
-            node.GetConfigValue(out this.options[CareerOptions.LOCKSCIENCE]._state, "LockScience");
-            node.GetConfigValue(out this.options[CareerOptions.LOCKREPUTATION]._state, "LockReputation");
-            node.GetConfigValue(out this.options[CareerOptions.UNLOCKBUILDINGS]._state, "UnlockBuildings");
-            node.GetConfigValue(out this.options[CareerOptions.UNLOCKTECH]._state, "UnlockTech");
+            node.GetConfigValue(out options[CareerOptions.LOCKFUNDS]._state, "LockFunds");
+            node.GetConfigValue(out options[CareerOptions.LOCKSCIENCE]._state, "LockScience");
+            node.GetConfigValue(out options[CareerOptions.LOCKREPUTATION]._state, "LockReputation");
+            node.GetConfigValue(out options[CareerOptions.UNLOCKBUILDINGS]._state, "UnlockBuildings");
+            node.GetConfigValue(out options[CareerOptions.UNLOCKTECH]._state, "UnlockTech");
         }
 
         public void SaveSettings(ConfigNode node)
@@ -135,24 +134,36 @@ namespace CareerManagerUI
             node.AddValue("UnlockBuildings", this.GetOption(CareerOptions.UNLOCKBUILDINGS).ToString());
             node.AddValue("UnlockTech", this.GetOption(CareerOptions.UNLOCKTECH).ToString());
         }
+        private void OnGUI()
+        {
+            if (toolbarControl != null)
+                toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy);
+
+            if (HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
+                DrawGUI();
+        }
 
         public void DrawGUI()
         {
             if (this.GuiActive)
             {
                 GUI.skin = HighLogic.Skin;
-                this.optionsWindowRect = GUILayout.Window(this.windowID, this.optionsWindowRect, this.Draw, "CareerManager Options");
+                this.optionsWindowRect = ClickThruBlocker.GUILayoutWindow(this.windowID, this.optionsWindowRect, this.Draw, "CareerManager Options");
             }
             if (kickstartEntry)
             {
                 guiActive = false;
-                kickstartWindowRect = GUILayout.Window(this.windowID + 1, kickstartWindowRect, DrawKickstartWindow, "Kickstart Career");
+                kickstartWindowRect = ClickThruBlocker.GUILayoutWindow(this.windowID + 1, kickstartWindowRect, DrawKickstartWindow, "Kickstart Career");
             }
         }
 
         string kickstartLevel = "";
         void DrawKickstartWindow(int windowID)
         {
+           
+            SetOption(CareerOptions.UNLOCKTECH, true);
+            SetOption(CareerOptions.KICKSTART, false);
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Enter kickstart level: ");
             kickstartLevel = GUILayout.TextField(kickstartLevel, 2);
@@ -171,7 +182,7 @@ namespace CareerManagerUI
             if (GUILayout.Button("Apply"))
             {
                 if (kickstartLevel != "")
-                CareerManager.Instance.TechnologiesUnlocked(true, true, int.Parse(kickstartLevel));
+                    CareerManager.Instance.TechnologiesUnlocked(true, true, int.Parse(kickstartLevel));
                 kickstartEntry = false;
             }
             GUILayout.FlexibleSpace();
@@ -186,28 +197,30 @@ namespace CareerManagerUI
 
         public void Draw(int windowID)
         {
+            Debug.Log("CareerManager, options.count: " + options.Count);
             GUILayout.BeginVertical(new GUILayoutOption[0]);
-            foreach (KeyValuePair<CareerOptions, MenuToggle> current in this.options)
+            foreach (KeyValuePair<CareerOptions, MenuToggle> current in options)
             {
                 current.Value.draw(HighLogic.LoadedScene);
             }
             GUILayout.EndVertical();
             GUI.DragWindow();
         }
+        void OnDestroy()
+        {
+            OnDisable();
+        }
 
         public void OnDisable()
         {
-            Debug.Log("OnDisable");
-            if (ToolbarManager.ToolbarAvailable && toolbarButton != null)
+            Debug.Log("CareerManagerUI.OnDisable");
+
+            if (toolbarControl != null)
             {
-                this.toolbarButton.Destroy();
-                this.toolbarButton = null;
+                toolbarControl.OnDestroy();
+                Destroy(toolbarControl);
             }
-            if (this.appLauncherButton != null)
-            {
-                ApplicationLauncher.Instance.RemoveModApplication(this.appLauncherButton);
-                this.appLauncherButton = null;
-            }
+
         }
     }
 }

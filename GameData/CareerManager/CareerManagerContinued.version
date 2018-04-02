@@ -1,25 +1,30 @@
 {
   "NAME": "CareerManagerContinued",
   "URL": "https://raw.githubusercontent.com/linuxgurugamer/CareerManagerContinued/master/Src/CareerManagerContinued.version",
+    "DOWNLOAD": "http://spacedock.info/mod/613/CareerManagerContinued",
+    "GITHUB": {
+    "USERNAME": "linuxgurugamer",
+    "REPOSITORY": "CareerManagerContinued"
+  },
   "VERSION": {
     "MAJOR": 1,
     "MINOR": 3,
-    "PATCH": 4,
-    "BUILD": 1
+    "PATCH": 5,
+    "BUILD": 0
   },
   "KSP_VERSION": {
     "MAJOR": 1,
-    "MINOR": 3,
+    "MINOR": 4,
     "PATCH": 1
   },
   "KSP_VERSION_MIN": {
     "MAJOR": 1,
-    "MINOR": 3,
+    "MINOR": 4,
     "PATCH": 1
   },
   "KSP_VERSION_MAX": {
     "MAJOR": 1,
-    "MINOR": 3,
-    "PATCH": 1
+    "MINOR": 4,
+    "PATCH": 99
   }
 }
