@@ -434,9 +434,11 @@ namespace CareerManagerNS
         bool blizzyEnabled = false;
         void restart()
         {
-            Debug.Log("restart, enabled: " + HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled.ToString());
-            Debug.Log("restart, useBlizzy: " + HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy.ToString());
-            Debug.Log("settingsEnabled: " + settingsEnabled.ToString() + "    blizzyEnabled: " + blizzyEnabled.ToString());
+
+            Utilities.Log("restart, enabled: " + HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled.ToString());
+            Utilities.Log("restart, useBlizzy: " + HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy.ToString());
+            Utilities.Log("settingsEnabled: " + settingsEnabled.ToString() + "    blizzyEnabled: " + blizzyEnabled.ToString());
+
             if (HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
             {
                 if (!settingsEnabled)
@@ -473,7 +475,6 @@ namespace CareerManagerNS
 
         private void Start()
         {
-            Debug.Log("CareerManager.Start");
             if (!HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
                 return;
             GameEvents.OnGameSettingsApplied.Add(restart);

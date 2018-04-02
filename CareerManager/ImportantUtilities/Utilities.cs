@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace ImportantUtilities
@@ -50,9 +51,15 @@ namespace ImportantUtilities
 			outval = node.GetValue(key);
 		}
 
-		public static void Log(string pluginName, int instanceID, string message)
+        [ConditionalAttribute("DEBUG")]
+        public static void Log(string message)
+        {
+            UnityEngine.Debug.Log("CareerManager: "+ message);
+        }
+        [ConditionalAttribute("DEBUG")]
+        public static void Log(string pluginName, int instanceID, string message)
 		{
-			Debug.Log(string.Concat(new string[]
+			UnityEngine.Debug.Log(string.Concat(new string[]
 			{
 				"[",
 				pluginName,

@@ -57,30 +57,26 @@ namespace CareerManagerUI
 
         public void Start()
         {
-            Debug.Log("CareerManagerUI.Start");
             InitToolbar();
             //DontDestroyOnLoad(this);
         }
         public void InitToolbar()
         {
-            Debug.Log("CareerManagerUI.InitToolbar");
 
+            if (toolbarControl == null)
             {
-
-                if (toolbarControl == null)
-                {
-                    toolbarControl = gameObject.AddComponent<ToolbarControl>();
-                    toolbarControl.AddToAllToolbars(ToggleGui, ToggleGui,
-                        ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION,
-                        "CareerManager_NS",
-                        "careerManagerButton",
-                        "CareerManager/icons/careermanager38",
-                        "CareerManager/icons/careermanager24",
-                        "Career Manager"
-                    );
-                    toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy);
-                }
+                toolbarControl = gameObject.AddComponent<ToolbarControl>();
+                toolbarControl.AddToAllToolbars(ToggleGui, ToggleGui,
+                    ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION,
+                    "CareerManager_NS",
+                    "careerManagerButton",
+                    "CareerManager/icons/careermanager38",
+                    "CareerManager/icons/careermanager24",
+                    "Career Manager"
+                );
+                toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy);
             }
+          
             this.windowID = Guid.NewGuid().GetHashCode();
             this.optionsWindowRect = new Rect(200f, 175f, 200f, 25f);
             kickstartWindowRect = new Rect(200f, 175f, 200f, 25f);
@@ -197,7 +193,6 @@ namespace CareerManagerUI
 
         public void Draw(int windowID)
         {
-            Debug.Log("CareerManager, options.count: " + options.Count);
             GUILayout.BeginVertical(new GUILayoutOption[0]);
             foreach (KeyValuePair<CareerOptions, MenuToggle> current in options)
             {
@@ -213,7 +208,6 @@ namespace CareerManagerUI
 
         public void OnDisable()
         {
-            Debug.Log("CareerManagerUI.OnDisable");
 
             if (toolbarControl != null)
             {
