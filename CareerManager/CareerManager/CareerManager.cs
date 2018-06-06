@@ -10,7 +10,8 @@ using Upgradeables;
 namespace CareerManagerNS
 {
 
-    [KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.SPACECENTER, GameScenes.TRACKSTATION)]
+//    [KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.EDITOR, GameScenes.SPACECENTER, GameScenes.TRACKSTATION)]
+    [KSPScenario(ScenarioCreationOptions.AddToExistingCareerGames | ScenarioCreationOptions.AddToNewCareerGames, GameScenes.FLIGHT, GameScenes.SPACECENTER, GameScenes.TRACKSTATION)]
     public class CareerManager : ScenarioModule
     {
         public static CareerManager Instance;
@@ -436,7 +437,6 @@ namespace CareerManagerNS
         {
 
             Utilities.Log("restart, enabled: " + HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled.ToString());
-            Utilities.Log("restart, useBlizzy: " + HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy.ToString());
             Utilities.Log("settingsEnabled: " + settingsEnabled.ToString() + "    blizzyEnabled: " + blizzyEnabled.ToString());
 
             if (HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
@@ -452,8 +452,6 @@ namespace CareerManagerNS
                     settingsEnabled = true;
 
                 }
-
-                blizzyEnabled = (/* ToolbarManager.ToolbarAvailable && */ HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy);
             }
 
 

@@ -10,7 +10,14 @@ using ToolbarControl_NS;
 
 namespace CareerManagerUI
 {
-
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
+    public class RegisterToolbar : MonoBehaviour
+    {
+        void Start()
+        {
+            ToolbarControl.RegisterMod(CareerManagerGUIClass.MODID, CareerManagerGUIClass.MODNAME);
+        }
+    }
     //[KSPAddon(KSPAddon.Startup.EditorAny | KSPAddon.Startup.SpaceCentre | KSPAddon.Startup.Flight | KSPAddon.Startup.TrackingStation, false)]
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     public class CareerManagerGUIClass : MonoBehaviour
@@ -60,6 +67,8 @@ namespace CareerManagerUI
             InitToolbar();
             //DontDestroyOnLoad(this);
         }
+        internal const string MODID = "CareerManager_NS";
+        internal const string MODNAME = "Career Manager";
         public void InitToolbar()
         {
 
@@ -68,13 +77,12 @@ namespace CareerManagerUI
                 toolbarControl = gameObject.AddComponent<ToolbarControl>();
                 toolbarControl.AddToAllToolbars(ToggleGui, ToggleGui,
                     ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION,
-                    "CareerManager_NS",
+                    MODID,
                     "careerManagerButton",
                     "CareerManager/icons/careermanager38",
                     "CareerManager/icons/careermanager24",
-                    "Career Manager"
+                    MODNAME
                 );
-                toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy);
             }
           
             this.windowID = Guid.NewGuid().GetHashCode();
@@ -90,12 +98,25 @@ namespace CareerManagerUI
 
         public void CreateToggle(CareerOptions opt, Rect rect, bool defaultstate, string description, Action<bool> cback)
         {
-            options.Add(opt, new MenuToggle(rect, defaultstate, description, cback));
+            try
+            {
+                options.Add(opt, new MenuToggle(rect, defaultstate, description, cback));
+            } catch
+            {
+                Debug.Log("Toggle (1) already exists: " + description);
+            }
         }
 
         public void CreateToggle(CareerOptions opt, Rect rect, bool defaultstate, string description, Action<bool> cback, GameScenes[] scenes)
         {
-            options.Add(opt, new MenuToggle(rect, defaultstate, description, cback, scenes));
+            try
+            {
+                options.Add(opt, new MenuToggle(rect, defaultstate, description, cback, scenes));
+            }
+            catch
+            {
+                Debug.Log("Toggle (2) already exists: " + description);
+            }
         }
 
         public bool GetOption(CareerOptions opt)
@@ -132,9 +153,6 @@ namespace CareerManagerUI
         }
         private void OnGUI()
         {
-            if (toolbarControl != null)
-                toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().useBlizzy);
-
             if (HighLogic.CurrentGame.Parameters.CustomParams<CareerManager_Settings>().enabled)
                 DrawGUI();
         }
