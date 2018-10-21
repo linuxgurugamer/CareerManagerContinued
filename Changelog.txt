@@ -30,3 +30,6 @@
 	Updated to latest ToolbarController 
 	Removed blizzy option
 	Added dependency checking
+
+1.3.5.3
+	Version bump for 1.5 rebuild

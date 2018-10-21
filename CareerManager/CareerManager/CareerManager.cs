@@ -205,6 +205,8 @@ namespace CareerManagerNS
             {
                 this.unlockTechnology = TechnologyUnlock.UNLOCK;
                 bool rnDOpen = this.RnDOpen;
+                Debug.Log("TechnologiesUnlocked, RnDOpen: " + this.RnDOpen);
+               // rnDOpen = true;
                 if (rnDOpen)
                 {
                     this.UnlockTechnologies(all, maxDepth);
@@ -221,6 +223,8 @@ namespace CareerManagerNS
             {
                 this.unlockTechnology = TechnologyUnlock.REVERT;
                 bool rnDOpen2 = this.RnDOpen;
+                Debug.Log("TechnologiesUnlocked, RnDOpen: " + this.RnDOpen);
+               // rnDOpen2 = true;
                 if (rnDOpen2)
                 {
                     this.LockTechnologies();
@@ -314,11 +318,13 @@ namespace CareerManagerNS
 
         public void RnDGUIClosed()
         {
+            Debug.Log("RnDGUIClosed");
             this.RnDOpen = false;
         }
 
         public void RnDGUIOpened()
         {
+            Debug.Log("RnDGUIOpened");
             this.RnDOpen = true;
         }
 
