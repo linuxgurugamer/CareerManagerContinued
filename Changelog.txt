@@ -44,3 +44,7 @@
 
 1.3.6.1
 	Updated MiniAVC to 1.4.0
+
+1.3.6.2
+	Updated MiniAVC.dll to 1.4.0.2 to fix a nasty CTD
+	Disabled toolbar button when not in Career or Science mode

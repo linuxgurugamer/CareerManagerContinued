@@ -71,23 +71,30 @@ namespace CareerManagerUI
         internal const string MODNAME = "Career Manager";
         public void InitToolbar()
         {
-
-            if (toolbarControl == null)
+            if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER ||
+                HighLogic.CurrentGame.Mode == Game.Modes.SCIENCE_SANDBOX)
             {
-                toolbarControl = gameObject.AddComponent<ToolbarControl>();
-                toolbarControl.AddToAllToolbars(ToggleGui, ToggleGui,
-                    ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION,
-                    MODID,
-                    "careerManagerButton",
-                    "CareerManager/icons/careermanager38",
-                    "CareerManager/icons/careermanager24",
-                    MODNAME
-                );
+                if (toolbarControl == null)
+                {
+                    toolbarControl = gameObject.AddComponent<ToolbarControl>();
+                    toolbarControl.AddToAllToolbars(ToggleGui, ToggleGui,
+                        ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.TRACKSTATION,
+                        MODID,
+                        "careerManagerButton",
+                        "CareerManager/icons/careermanager38",
+                        "CareerManager/icons/careermanager24",
+                        MODNAME
+                    );
+                }
+                else
+                {
+                    toolbarControl = null;
+                }
+
+                this.windowID = Guid.NewGuid().GetHashCode();
+                this.optionsWindowRect = new Rect(200f, 175f, 200f, 25f);
+                kickstartWindowRect = new Rect(200f, 175f, 200f, 25f);
             }
-          
-            this.windowID = Guid.NewGuid().GetHashCode();
-            this.optionsWindowRect = new Rect(200f, 175f, 200f, 25f);
-            kickstartWindowRect = new Rect(200f, 175f, 200f, 25f);
         }
 
         public CareerManagerGUIClass()
@@ -101,7 +108,8 @@ namespace CareerManagerUI
             try
             {
                 options.Add(opt, new MenuToggle(rect, defaultstate, description, cback));
-            } catch
+            }
+            catch
             {
                 Debug.Log("Toggle (1) already exists: " + description);
             }
@@ -174,7 +182,7 @@ namespace CareerManagerUI
         string kickstartLevel = "";
         void DrawKickstartWindow(int windowID)
         {
-           
+
             SetOption(CareerOptions.UNLOCKTECH, true);
             SetOption(CareerOptions.KICKSTART, false);
 
