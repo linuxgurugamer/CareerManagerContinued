@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 
-namespace ImportantUtilities
+namespace CareerManagerNS
 {
 	public static class Utilities
 	{
@@ -51,16 +51,15 @@ namespace ImportantUtilities
 			outval = node.GetValue(key);
 		}
 
+        [ConditionalAttribute("DEBUG")]
         public static void Log(string message)
         {
-#if DEBUG
-			UnityEngine.Debug.Log("CareerManager: "+ message);
-#endif
+            UnityEngine.Debug.Log("CareerManager: "+ message);
         }
 
+        [ConditionalAttribute("DEBUG")]
         public static void Log(string pluginName, int instanceID, string message)
 		{
-#if DEBUG
 			UnityEngine.Debug.Log(string.Concat(new string[]
 			{
 				"[",
@@ -72,7 +71,6 @@ namespace ImportantUtilities
 				"]: ",
 				message
 			}));
-#endif
 		}
 	}
 }
