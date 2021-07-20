@@ -51,14 +51,16 @@ namespace ImportantUtilities
 			outval = node.GetValue(key);
 		}
 
-        [ConditionalAttribute("DEBUG")]
         public static void Log(string message)
         {
-            UnityEngine.Debug.Log("CareerManager: "+ message);
+#if DEBUG
+			UnityEngine.Debug.Log("CareerManager: "+ message);
+#endif
         }
-        [ConditionalAttribute("DEBUG")]
+
         public static void Log(string pluginName, int instanceID, string message)
 		{
+#if DEBUG
 			UnityEngine.Debug.Log(string.Concat(new string[]
 			{
 				"[",
@@ -70,6 +72,7 @@ namespace ImportantUtilities
 				"]: ",
 				message
 			}));
+#endif
 		}
 	}
 }
