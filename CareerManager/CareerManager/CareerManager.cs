@@ -578,7 +578,8 @@ namespace CareerManagerNS
             RDController.OnRDTreeSpawn.Remove(new EventData<RDController>.OnEvent(this.RnDOpened));
             GameEvents.onGUIRnDComplexSpawn.Remove(new EventVoid.OnEvent(this.RnDGUIOpened));
             GameEvents.onGUIRnDComplexDespawn.Remove(new EventVoid.OnEvent(this.RnDGUIClosed));
-            
+            GameEvents.OnGameSettingsApplied.Remove(restart);
+
         }
     }
 }
